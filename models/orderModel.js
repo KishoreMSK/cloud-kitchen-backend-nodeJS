@@ -1,29 +1,33 @@
 const mongoose = require('mongoose')
 
-const user = mongoose.Schema(
+const orderDetails = mongoose.Schema(
     {
-        userName: {
+        orderId:{
+            type: Number,
+            required: true
+        },
+        customerId:{
             type: String,
             required: true
         },
-        phoneNo: {
+        productId:{
             type: String,
             required: true
         },
-        address: {
+        productName:{
             type: String,
             required: true
         },
-        email: {
-            type: String,
+        price:{
+            type: Number,
             required: true
         },
-        userType: {
-            type: String,
+        quantity:{
+            type: Number,
             required: true,
-            default: "customer"
+            min: 1
         },
-        loginPassword: {
+        orderStatus:{
             type: String,
             required: true
         }
@@ -33,6 +37,6 @@ const user = mongoose.Schema(
     }
 )
 
-const registerUser = mongoose.model('RegisterUserDetails',user);
+const orderModel = mongoose.model('orderDetails',orderDetails)
 
-module.exports = registerUser;
+module.exports = orderModel
