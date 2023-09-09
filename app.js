@@ -2,7 +2,6 @@ const express  = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors');
 
-const login = require('./models/loginModel')
 const registerUser = require('./models/registerModel')
 const product = require('./models/productModel')
 const orderDetails = require('./models/orderModel')
@@ -29,7 +28,8 @@ app.delete('/admin/deleteById/', async(req,res) => {
 app.delete('/order/cancelOrders', async(req, res) => {
     try {
         const {productName,orderId} = req.body
-        const orderFound = await orderDetails.findOneAndDelete(orderId)
+        const orderFound = await orderDetails.findByIdAndDelete(orderId)
+        console.log(orderFound);
         if(!orderFound){
             return res.status(404).send(`Orderid: ${orderId} was not found`)
         }
@@ -42,33 +42,14 @@ app.delete('/order/cancelOrders', async(req, res) => {
 
 app.post('/order/insertOrders', async(req, res) => {
     try {
-        const order= req.body
-        //to find whether the order is already exist or not
-        const orderFound = await orderDetails.findOne({order})
-        console.log(orderFound);
-        if(orderFound){
-            const {price, quantity} = others
-            const updatedPrice = orderFound.price = price * quantity
-            // console.log(price * quantity);
-            await orderDetails.findOneAndUpdate({orderId}, {$set : {price : updatedPrice, quantity}}, {new : true})
-            const updatedOrder = await orderDetails.find({orderId},{createdAt:0,updatedAt:0,__v:0})
-            return res.status(200).send(`order updated successfully ${updatedOrder}`)
-        } else {
-            // console.log(others[0].orderStatus === 'Ordered');
-            if(others[0].orderStatus === 'Ordered'){
-                //..another way of inserting a document
-                // const newOrder = new orderDetails({
-                //     orderId,
-                //     ...others
-                // })
-                // await newOrder.save()
-                await orderDetails.create({orderId,...others})
-                const createdOrder = await orderDetails.findOne({orderId},{ createdAt:0, updatedAt:0, __v:0})
-                return res.status(200).json(`Order created successfully with ${createdOrder}`)
-           } else {
-               return res.status(400).json({message: `invalid orderstatus found`})
-           }
-        }
+        const order = req.body
+        await orderDetails.insertMany(order)
+        const allOrders = await orderDetails.find({})
+        const modResponse = allOrders.map((doc) => {
+            const {_id, ...rest} = doc.toObject();
+            return {id: _id, ...rest}
+        })
+        res.status(200).send(modResponse)
     } catch (error) {
         res.status(400).json({message: error.message})
     }
@@ -101,11 +82,15 @@ app.post('/validateUser', async(req, res) => {
     try {
         const {email , loginPassword, userType} = req.body
         const userFound = await registerUser.findOne({email})
-        console.log(userFound.userType.toLowerCase() != userType.toLowerCase());
         if(userFound.loginPassword != loginPassword || userFound.userType.toLowerCase() != userType.toLowerCase()){
             return res.status(401).json({messege: `You are not authorized to login. Provide valid credentials..!`})
         }
-        return res.status(200).json(true)
+        const modResponse = {
+            id: userFound._id,   
+            ...userFound.toObject(),
+        }
+        delete modResponse._id;
+        return res.status(200).json(modResponse)
         
     } catch (error) {
         res.status(400).json({message: error.message})
