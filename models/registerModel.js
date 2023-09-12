@@ -7,14 +7,14 @@ const user = mongoose.Schema(
       required: true,
     },
     phoneNo: {
-      type: String,
+      type: Number,
       required: true,
-      validate: {
-        validator: (value) => {
-          return value.length === 10;
-        },
-        message: "Phone number must be 10 characters long",
-      },
+    //   validate: {
+    //     validator: (value) => {
+    //       return value.length === 10;
+    //     },
+    //     message: "Phone number must be 10 characters long",
+    //   },
     },
     address: {
       type: String,
@@ -25,13 +25,13 @@ const user = mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
-      validate:{
-        validator: (value) => {
-            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-            return emailRegex.test(value);
-        },
-        message: "Invalid email address",
-      }
+    //   validate:{
+    //     validator: (value) => {
+    //         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    //         return emailRegex.test(value);
+    //     },
+    //     message: "Invalid email address",
+    //   }
     },
     userType: {
       type: String,

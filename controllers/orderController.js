@@ -1,22 +1,34 @@
 const orderDetails = require('../models/orderModel')
 const productDetails = require('../models/productModel')
+
     const insertOrders = async(req, res) => {
         try {
             const order = req.body
             await orderDetails.insertMany(order)
+            // console.log(order);
             // const allOrders = await orderDetails.find({})
             //use this to change in array of objects
             // const modResponse = allOrders.map((doc) => {
             //     const {_id, ...rest} = doc.toObject();
             //     return {id: _id, ...rest}
             // })
-            const productId =  order.map(item => item.productId)
-            console.log(order , productId);
-            const productFound = await productDetails.findById(productId)
-            const newStockCount = Number(productFound.stockCount) - Number(order.quantity)
-            console.log(newStockCount);
-            // await productDetails.findOneAndUpdate(order.productId, {$set: {stockCount: stockCount-order.quantity}},{new: true})
-            // res.status(200).json({success: true,message:'Order created succseefully..!'})
+            const updatedProducts = [];
+            for (const orderItem of order) {
+                const { productId, quantity} = orderItem;
+                console.log(productId , quantity);
+                        const updatedProduct =
+                        await productDetails.findOneAndUpdate(
+                          { _id: productId },
+                          { $inc: {stockCount: -quantity } },
+                        //   { new: true }
+                        );
+                      console.log(updatedProduct);
+                      if (updatedProduct) {
+                        updatedProducts.push(updatedProduct);
+                      }
+              }
+              console.log(updatedProducts);
+            res.status(200).json({success: true,message:'Order created succseefully..!'})
         } catch (error) {
             res.status(400).json({message: error.message})
         }

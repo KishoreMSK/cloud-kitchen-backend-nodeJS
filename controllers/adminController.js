@@ -16,7 +16,7 @@ const deleteProduct = async(req,res) => {
 
 const getAllProducts = async(req, res) => {
     try {
-        const productsList = await product.find({})
+        const productsList = await product.find({}, {__v:0})
         const data = productsList.map((prod) => {
             const { _id, ...rest} = prod.toObject();
             return {id: _id, ...rest}
@@ -33,7 +33,7 @@ const addProduct = async(req, res) => {
         if(!productDetails){
             return res.status(404).send('Enter valid details')
         }
-        const products = await product.create(productDetails)
+        await product.create(productDetails)
         res.status(200).json({success: true, message: 'Product added successfully'})
     } catch (error) {
         res.status(400).json({message: error.message})
