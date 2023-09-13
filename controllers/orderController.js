@@ -14,21 +14,23 @@ const productDetails = require('../models/productModel')
             // })
             const updatedProducts = [];
             for (const orderItem of order) {
-                const { productId, quantity} = orderItem;
-                console.log(productId , quantity);
-                        const updatedProduct =
-                        await productDetails.findOneAndUpdate(
-                          { _id: productId },
-                          { $inc: {stockCount: -quantity } },
-                        //   { new: true }
-                        );
-                      console.log(updatedProduct);
-                      if (updatedProduct) {
-                        updatedProducts.push(updatedProduct);
-                      }
+              const { productId, quantity } = orderItem;
+            // using custom method for finding
+            //   const nameFound = await productDetails.findByFoodName(productName)
+            //   console.log(nameFound);
+
+              const updatedProduct = await productDetails.findOneAndUpdate(
+                { _id: productId },
+                { $inc: { stockCount: -quantity } },
+                // { runValidators: true} // will check for the validation mention in the schema.. otherwise it will update the value regardless of the validation in schema
+                { new: true }
+              );
+            //   console.log(updatedProduct);
+              if (updatedProduct) {
+                updatedProducts.push(updatedProduct);
               }
-              console.log(updatedProducts);
-            res.status(200).json({success: true,message:'Order created succseefully..!'})
+            }
+            res.status(200).json({success: true,message:'Order created successfully..!'})
         } catch (error) {
             res.status(400).json({message: error.message})
         }
@@ -42,11 +44,10 @@ const productDetails = require('../models/productModel')
             if(!orderFound){
                 return res.status(404).send(`Orderid: ${orderId} was not found`)
             }
-            return res.status(200).send(`Order id: ${orderId} with the product name:${productName} is deleted successfully`)
+            return res.status(200).json({success: true,message:`Order id: ${orderId} with the product name:${productName} is deleted successfully`})
         } catch (error) {
             res.status(400).json({message: error.message})
         }
     }
-
 
 module.exports = {insertOrders,cancelOrders};

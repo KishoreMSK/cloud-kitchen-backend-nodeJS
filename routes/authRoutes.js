@@ -6,6 +6,6 @@ const authController = require('../controllers/authController')
 router.post('/',authController.validateUser)
 
 //register user details
-router.post('/create', authController.createUser)
+router.post('/user', authController.createUser)
 
 module.exports = router

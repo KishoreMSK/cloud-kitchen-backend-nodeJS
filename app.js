@@ -10,7 +10,7 @@ app.use(cors("*"));
 app.use(express.json())
 
 app.use('/validateUser',auth)
-app.use('/createUser',auth)
+app.use('/create',auth)
 app.use('/order',orderRoutes)
 app.use('/admin',adminRoutes)
 

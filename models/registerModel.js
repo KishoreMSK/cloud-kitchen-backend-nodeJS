@@ -24,7 +24,9 @@ const user = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
+      lowercase: true, //will convert the value into lowercase
+      immutable: true, // will not allow to change the value once it is created
+      //custome validation
     //   validate:{
     //     validator: (value) => {
     //         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -46,6 +48,10 @@ const user = mongoose.Schema(
     timestamps: true,
   }
 );
+
+user.statics.findByEmail = function(email) {
+    return this.where({email})
+}
 
 const registerUser = mongoose.model("RegisterUserDetails", user);
 

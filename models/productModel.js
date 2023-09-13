@@ -59,7 +59,24 @@ const productSchema = mongoose.Schema(
         timestamps: true
     }
 )
+// productSchema.methods.sayHi = function() {
+    // return 'hii..hello';
+// }
+//Using middleware functions
+productSchema.pre('find', function(next){
+    // product.sayHi()
+    console.log(`documents retrieved successfully`);
+    next()
+})
 
 const product = mongoose.model('Products',productSchema)
+
+product.findByFoodName = function(name){
+    console.log(name);
+    return this.find({foodName: name})
+}
+
+
+
 
 module.exports = product
