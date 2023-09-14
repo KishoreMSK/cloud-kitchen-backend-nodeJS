@@ -1,5 +1,8 @@
+require('dotenv').config()
 const registerUser = require('../models/registerModel')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 const validateUser = async(req, res) => {
     try {
         const {email , loginPassword, userType} = req.body
@@ -22,7 +25,14 @@ const validateUser = async(req, res) => {
           ...userFound.toObject(),
         };
         delete data._id;
-        return res.status(200).json({ success: true, ...data });
+
+        //JWT Authentication - create a JWT token with the user information
+        const accessToken = jwt.sign(data, process.env.ACCESS_SECRET_TOKEN, { expiresIn: '15s'})
+        const refreshToken = jwt.sign(data, process.env.ACCESS_REFRESH_TOKEN)
+
+        console.log(accessToken);
+        return res.status(200).json({ success: true, accessToken: accessToken, refreshToken: refreshToken });
+
     } catch (error) {
         res.status(400).json({message: error.message})
     }
@@ -52,4 +62,4 @@ const createUser = async(req, res) => {
     }
 }
 
-module.exports = {validateUser, createUser};
+module.exports = {validateUser, createUser}; 
